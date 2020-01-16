@@ -1,3 +1,7 @@
+#Created on 15 January, 2020
+#This intellectual property belongs to Aashish Adhikari.
+#Any usage by others hereafter is required to cite the author.
+
 import time, numpy as np
 import torch
 from torch.autograd import Variable

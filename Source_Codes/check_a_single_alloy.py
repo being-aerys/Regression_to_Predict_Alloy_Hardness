@@ -1,4 +1,6 @@
-#Mo15Nb20Re15Ta30W20 2850
+#Created on 15 January, 2020
+#This intellectual property belongs to Aashish Adhikari.
+#Any usage by others hereafter is required to cite the author.
 
 import time, numpy as np
 import torch
@@ -58,14 +60,9 @@ if __name__ == "__main__":
     # Mo15 Nb20 Re15 Ta30 W20 --> 2850
 
     #Cr Hf Mo Nb Ta Ti Re V W Zr TransferTemp VolumePer EnergyPer Density BindingEnergy , Melting Temp
-    input, label = [0,0,15,20,30,0,15,0,20,0,878,16.768,-11.8297, -0.154, 15.048],0
+    input = [0,0,15,20,30,0,15,0,20,0,878,16.768,-11.8297, -0.154, 15.048]
 
-
-
-    label = [label]
-    input, label = torch.tensor(input), torch.tensor(label)
-
-
+    input = torch.tensor(input)
 
     output = network(input)
 
