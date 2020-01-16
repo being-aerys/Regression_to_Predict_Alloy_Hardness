@@ -40,7 +40,7 @@ if __name__ == "__main__":
     network = NeuralNetwork(15,1)
 
     '''Load the saved model's parameters'''
-    saved_state_statistics_of_the_model = torch.load("mytraining2.pth")
+    saved_state_statistics_of_the_model = torch.load("../Saved_Models/Melting_Point_Prediction_199_tensor(2159.4307, device='cuda:0').pth")
     for keyname_of_the_state_statistic in saved_state_statistics_of_the_model:
         print(keyname_of_the_state_statistic)
 
@@ -57,8 +57,15 @@ if __name__ == "__main__":
 
     # Mo15 Nb20 Re15 Ta30 W20 --> 2850
 
-    #Cr Hf Mo Nb Ta Ti Re V W Zr TransferTemp VolumePer EnergyPer Binding Density BindingEnergy , Melting Temp
-    input, label = [0,0,15,20,30,0,15,0,20,0,878,11.8263,],0
+    #Cr Hf Mo Nb Ta Ti Re V W Zr TransferTemp VolumePer EnergyPer Density BindingEnergy , Melting Temp
+    input, label = [0,0,15,20,30,0,15,0,20,0,878,16.768,-11.8297, -0.154, 15.048],0
+
+
+
+    label = [label]
+    input, label = torch.tensor(input), torch.tensor(label)
+
+
 
     output = network(input)
 
