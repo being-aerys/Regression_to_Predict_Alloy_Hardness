@@ -12,10 +12,15 @@ import pandas as pd
 import copy
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
-import sys
+import sys, os
 from math import sqrt
 
 #melting point and hardness
+
+'''If cuda device present, use cuda, else use cpu.'''
+#use_cuda = True if torch.cuda.device_count() > 0 else False
+use_cuda = False #But in this case always use cpu
+
 
 
 class NeuralNetwork(nn.Module):
@@ -84,14 +89,18 @@ class NeuralNetwork(nn.Module):
 
 if __name__ == "__main__":
 
-    #Set manual seeds
-    if torch.cuda.device_count() >0:
-        torch.cuda.manual_seed(100)
-    #torch.seed(100)
     '''Check for cuda devices'''
-    print("Current cuda device is ", torch.cuda.current_device())
-    print("Total cuda-supporting devices count is ", torch.cuda.device_count())
-    print("Current cuda device name is ", torch.cuda.get_device_name(torch.cuda.current_device()))
+    if use_cuda == True:
+        #Set manual seed.
+        torch.cuda.manual_seed(100)
+        print("Current cuda device is ", torch.cuda.current_device())
+        print("Total cuda-supporting devices count is ", torch.cuda.device_count())
+        print("Current cuda device name is ", torch.cuda.get_device_name(torch.cuda.current_device()))
+    else:
+        print("No cuda device available.")
+    #torch.seed(100)
+
+
 
     '''Retrieve data'''
     #Use only 5 relevant features without composition information
@@ -200,7 +209,7 @@ if __name__ == "__main__":
     network = NeuralNetwork(num_features,1) # We only care about the hardness temperature for now
 
     '''If cuda device available, move the model to cuda device'''
-    if torch.cuda.device_count() > 0:
+    if use_cuda == True:
         network.cuda()  # moving the model to gpu if available
 
     '''Convert all the model parameters to float'''
@@ -262,7 +271,7 @@ if __name__ == "__main__":
             value = [value]
 
             '''If GPU available, convert the input to cuda FloatTensors, else torch FloatTensors.'''
-            if torch.cuda.device_count() > 0:
+            if use_cuda == True:
                 feature, value = torch.cuda.FloatTensor(feature), torch.cuda.FloatTensor(value)
             else:
                 feature, value = torch.FloatTensor(feature), torch.FloatTensor(value)
@@ -304,7 +313,7 @@ if __name__ == "__main__":
 
                     feature, value = scaled_training_data[idx][:target_column_num], scaled_training_data[idx][target_column_num]
                     value = [value]
-                    if torch.cuda.device_count() >0:
+                    if use_cuda == True:
                         feature, value = torch.cuda.FloatTensor(feature), torch.cuda.FloatTensor(value)
                     else:
                         feature, value = torch.FloatTensor(feature), torch.FloatTensor(value)
@@ -327,7 +336,7 @@ if __name__ == "__main__":
             for idx in range(len(testing_data)):
                 feature, value = scaled_testing_data[idx][:target_column_num], scaled_testing_data[idx][target_column_num]
                 value = [value]
-                if torch.cuda.device_count() > 0:
+                if use_cuda == True:
                     feature, value = torch.cuda.FloatTensor(feature), torch.cuda.FloatTensor(value)
                 else:
                     feature, value = torch.FloatTensor(feature), torch.FloatTensor(value)
@@ -347,7 +356,11 @@ if __name__ == "__main__":
                   "Average Testing Loss: ", total_testing_loss / len(scaled_testing_data))
         if total_testing_loss / len(testing_data) < testing_loss_comparator:
             print("\nFound a model with a decreased testing loss in epoch ", epoch_num, ". Saving the model as: target_Hardness_features_"+str(num_features)+"_epochs_"+str(epoch_num)+'.pth\n')
-            torch.save(network.state_dict(), '../Saved_Models_All_Features_only_simulation_data/target_Hardness_features_'+str(num_features)+"_epochs_"+str(epoch_num)+'.pth')
+            #Create directory if doesnt exist
+            if not os.path.exists("Saved_Models_All_Features_only_simulation_data"):
+                os.makedirs("Saved_Models_All_Features_only_simulation_data")
+
+            torch.save(network.state_dict(), 'Saved_Models_All_Features_only_simulation_data/target_Hardness_features_'+str(num_features)+"_epochs_"+str(epoch_num)+'.pth')
             testing_loss_comparator = total_testing_loss/len(scaled_testing_data)
 
 
@@ -411,8 +424,10 @@ if __name__ == "__main__":
     # plt.title("Number of Epochs vs L1 Loss")
     # plt.grid()
 
-    np.savetxt(fname='../Saved_Models_All_Features_only_simulation_data/training_loss_list.csv', X=average_training_loss_list, delimiter=",")
-    np.savetxt(fname='../Saved_Models_All_Features_only_simulation_data/testing_loss_list.csv', X=average_testing_loss_list, delimiter=",")
+
+
+    np.savetxt(fname='Saved_Models_All_Features_only_simulation_data/training_loss_list.csv', X=average_training_loss_list, delimiter=",")
+    np.savetxt(fname='Saved_Models_All_Features_only_simulation_data/testing_loss_list.csv', X=average_testing_loss_list, delimiter=",")
 
     print('Finished Training')
 
@@ -421,8 +436,8 @@ if __name__ == "__main__":
 
     epoch_list_for_the_plot = [i for i in range(1, max_epochs+1, 1)]
 
-    training_loss = np.genfromtxt("training_loss_list.csv", delimiter=",")
-    testing_loss_list = np.genfromtxt("testing_loss_list.csv", delimiter=",")
+    training_loss = np.genfromtxt("Saved_Models_All_Features_only_simulation_data/training_loss_list.csv", delimiter=",")
+    testing_loss_list = np.genfromtxt("Saved_Models_All_Features_only_simulation_data/testing_loss_list.csv", delimiter=",")
     plt.plot(epoch_list_for_the_plot, testing_loss_list, 'r')  # pass array or list
     plt.plot(epoch_list_for_the_plot, training_loss, 'g')
     plt.xlabel("No. of Epochs")
