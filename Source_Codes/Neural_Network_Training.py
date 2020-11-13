@@ -171,6 +171,11 @@ if __name__ == "__main__":
     # Calculate the num of input features
     num_features = feature_with_labels.shape[1] - 1
 
+
+    print(num_features)
+
+    input()
+
     '''Lets comment the code that appends a specific test sample to the testing set for now.'''
     #Append the test sample the we need to check explicitly at the end of the test set
     # print("Before adding the explicit test sample, the shape of the testing set is: ",testing_data.shape)
