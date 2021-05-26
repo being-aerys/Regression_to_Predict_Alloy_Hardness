@@ -4,7 +4,6 @@ We use several physical and compositional features of different alloys to predic
 Following is a sample image of how loss reduces over time for one configuration of random hyperparameters search.
 <img src="https://github.com/being-aerys/Regression_to_Predict_Alloy_Hardness/blob/master/plots/train_and_test_loss_485.png" width="700" height="600">
 
-https://github.com/being-aerys/Regression_to_Predict_Alloy_Hardness/blob/master/plots/train_and_test_loss_485.png
 ## Dependencies
 This project requires python and the following python libraries.
 1. skorch
